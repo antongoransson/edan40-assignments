@@ -112,16 +112,26 @@ substitute w t s = join (map(\x -> if x == w then s else [x]) t)
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
+match _ [] [] = Just []
+match _ [] s = Nothing
+match _ p [] = Nothing
 match _ _ _ = Nothing
+-- match w p s =
+--   | p[0] == w =
+--   | otherwise
+
 {- TO BE WRITTEN -}
 
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-singleWildcardMatch (wc:ps) (x:xs) = Nothing
-{- TO BE WRITTEN -}
+singleWildcardMatch (wc:ps) (x:xs)
+  | ps == xs  = Just [x]
+  | otherwise = Nothing
+
 longerWildcardMatch (wc:ps) (x:xs) = Nothing
-{- TO BE WRITTEN -}
+  -- | take 1 xs  == [1,2,3]= Just (take (length xs - length ps) xs)
+  -- | otherwise = Nothing
 
 
 
