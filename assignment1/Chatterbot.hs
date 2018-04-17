@@ -2,6 +2,7 @@ module Chatterbot where
 import Utilities
 import System.Random
 import Data.Char
+import Control.Monad
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
@@ -66,7 +67,7 @@ present :: Phrase -> String
 present = unwords
 
 prepare :: String -> Phrase
-prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
+prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
 {- TO BE WRITTEN -}
@@ -102,11 +103,10 @@ reductionsApply _ = id
 -------------------------------------------------------
 -- Match and substitute
 --------------------------------------------------------
-
+-- wildcard t s (char, string, string)
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
-substitute _ _ _ = []
-{- TO BE WRITTEN -}
+substitute w t s = join (map(\x -> if x == w then s else [x]) t)
 
 
 -- Tries to match two lists. If they match, the result consists of the sublist
@@ -153,5 +153,3 @@ transformationApply _ _ _ _ = Nothing
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ _ _ = Nothing
 {- TO BE WRITTEN -}
-
-
