@@ -28,4 +28,4 @@ fix f x
 --xs !! i works like xs[i]
 -- Pick a index in lists  r  >= 0, r < 1 (probably used with random)
 pick :: RealFrac r => r -> [a] -> a
-pick u xs = xs !! (floor(u*).fromIntegral.length) xs
+pick u xs = xs !! (floor.(u*).fromIntegral.length) xs
