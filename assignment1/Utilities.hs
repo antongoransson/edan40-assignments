@@ -27,5 +27,6 @@ fix f x
 
 --xs !! i works like xs[i]
 -- Pick a index in lists  r  >= 0, r < 1 (probably used with random)
+-- = floor(length(xs) -> fromIntegral * u )
 pick :: RealFrac r => r -> [a] -> a
 pick u xs = xs !! (floor.(u*).fromIntegral.length) xs

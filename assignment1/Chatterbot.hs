@@ -118,25 +118,15 @@ match _ p [] = Nothing
 match w p s
   | head p == w = orElse (singleWildcardMatch p s) (longerWildcardMatch p s)
   | head p == head s = match w (tail p) (tail s)
-  | otherwise = longerWildcardMatch p s
-
-
-
+  | otherwise = Nothing
 
 -- The function singleWildcardMatch defines the case when the rest of the list matches with the rest of the pattern, i.e. the front wildcard removed
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-singleWildcardMatch (wc:ps) (x:xs)
-  | null ps     = Just (x:xs)
-  | ps == xs    = Just [x]
-  | otherwise   = Nothing
-
+singleWildcardMatch (wc:ps) (x:xs) = mmap (const [x]) $ match wc ps xs
 -- The function longerWildcardMatch defines the case when rest of the list matches with the pattern with the wildcard retained at the front.
-longerWildcardMatch (wc:ps) (x:xs)
-  | (take (length ps) (reverse xs)   == reverse ps)
-    && length (take (length (x:xs) - length ps) (x:xs)) > 1
-              = Just (take (length (x:xs) - length ps) (x:xs))
-  | otherwise = Nothing
+longerWildcardMatch (wc:ps) (x:xs) =  mmap (x:) $ match wc (wc:ps) xs
+
 
 
 
