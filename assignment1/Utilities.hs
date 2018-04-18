@@ -4,7 +4,7 @@ module Utilities where
 map2 :: (a -> b, c -> d) -> (a, c) -> (b, d)
 map2 (f1, f2) (x1, x2) = (f1 x1, f2 x2)
 
--- Applies a function on two maybe variables
+-- Applies a function on a maybe variable if the value is just
 mmap :: (a -> b) -> Maybe a -> Maybe b
 mmap f  Nothing  = Nothing
 mmap f (Just x)  = Just (f x)
