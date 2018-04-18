@@ -2,7 +2,6 @@ module Chatterbot where
 import Utilities
 import System.Random
 import Data.Char
-import Control.Monad
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
