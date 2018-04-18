@@ -106,8 +106,9 @@ reductionsApply _ = id
 -- wildcard t s (char, string, string)
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
-substitute w t s =  join (map(\x -> if x == w then s else [x]) t)--foldr (:) [] (map(\x -> if x == w then s else [x]) t)
-
+substitute w t s =  concatMap replace  t
+  where replace x | x == w = s
+                  | otherwise = [x]
 
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
@@ -147,15 +148,13 @@ matchCheck = matchTest == Just testSubstitutions
 -------------------------------------------------------
 -- Applying patterns
 --------------------------------------------------------
-
+-- frenchPresentation = ("My name is *", "Je m'appelle *")
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) ->  Maybe [a]
-transformationApply wc f s pattern
-  | match wc (fst pattern) s == Nothing = Nothing
-  | otherwise =  Just $ substitute wc (snd pattern) $ maybe s id $ mmap f $ match wc (fst pattern) s
+transformationApply wc f s p
+  | match wc (fst p) s == Nothing = Nothing
+  | otherwise =  Just $ substitute wc (snd p) $ maybe s id $ mmap f $ match wc (fst p) s
 
--- frenchPresentation = ("My name is *", "Je m'appelle *")
--- transformationApply '*' id "My name is Zacharias" frenchPresentation
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
