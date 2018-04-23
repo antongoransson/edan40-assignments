@@ -75,6 +75,7 @@ module Main where
   main = runTestTT $
     test [
       "substitute" ~: Main.substituteTest,
+      "reduce" ~: Main.reduceTest,
       "match" ~: Main.matchTest,
       "transformationApply" ~: transformationApplyTest,
       "transformationsApply" ~: transformationsApplyTest,
