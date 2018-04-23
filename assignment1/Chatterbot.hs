@@ -22,18 +22,18 @@ type Phrase = [String]
 type PhrasePair = (Phrase, Phrase)
 type BotBrain = [(Phrase, [Phrase])]
 
-
+-- ["Do you really think I don't * ?", "Perhaps eventually I will * .", "Do you really want me to * ?"]
 --------------------------------------------------------
-
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
-{- TO BE WRITTEN -}
-stateOfMind _ = return id
+stateOfMind brain = do
+                 r <- randomIO :: IO Float
+                 return $ rulesApply (map (map2 (id, pick r)) brain)
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply transformations phrase =  maybe [] id $ transformationsApply "*" reflect transformations phrase
 
 reflect :: Phrase -> Phrase
-reflect phrase = map refl phrase
+reflect = map refl
   where refl word | Just reflection <- lookup word reflections = reflection
                   | otherwise = word
 reflections =
@@ -65,16 +65,14 @@ present :: Phrase -> String
 present = unwords
 
 prepare :: String -> Phrase
-prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
+prepare = words . map toLower .
+          filter (not . flip elem ".,:;*!#%&|")--reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
-{- TO BE WRITTEN -}
-rulesCompile _ = []
-
-
+rulesCompile  = map $ map2 (words. map toLower, map words)
 --------------------------------------
 
-
+plsd = ["you", "will", "never", "see", "your", "reflection", "in", "my", "eyes"]
 reductions :: [PhrasePair]
 reductions = (map.map2) (words, words)
   [ ( "please *", "*" ),
@@ -143,17 +141,19 @@ matchCheck = matchTest == Just testSubstitutions
 -------------------------------------------------------
 -- Applying patterns
 --------------------------------------------------------
--- frenchPresentation = ("My name is *", "Je m'appelle *")
 -- Applying a single pattern wc function string pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) ->  Maybe [a]
 transformationApply wc f s p
   | Just m <- match wc (fst p) s = Just $ substitute wc (snd p) $ f m
   | otherwise                    = Nothing
 
+-- transformationApply wc f s p
+--   | match wc (fst p) s == Nothing = Nothing
+--   | otherwise =  Just $ substitute wc (snd p) $ maybe s id $ mmap f $ match wc (fst p) s
 -- Applying a list of patterns until one succeeds
 -- wc function patterns string
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ [] _ = Nothing
 transformationsApply wc f (p:ps) s
-  | val <- transformationApply wc f s p = val
-  | otherwise                           =  transformationsApply wc f ps s
+  | transformationApply wc f s p == Nothing = transformationsApply wc f ps s--transformationApply wc f s p--val <- transformationApply wc f s p = val
+  | otherwise                           =  transformationApply wc f s p
