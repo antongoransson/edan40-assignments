@@ -31,11 +31,9 @@ stateOfMind brain = do
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply transformations phrase =  maybe [] id $ transformationsApply "*" reflect transformations phrase
-
 reflect :: Phrase -> Phrase
-reflect = map refl
-  where refl word | Just reflection <- lookup word reflections = reflection
-                  | otherwise = word
+reflect = map $ try (flip lookup reflections)
+
 reflections =
   [ ("am",     "are"),
     ("was",    "were"),
@@ -65,14 +63,13 @@ present :: Phrase -> String
 present = unwords
 
 prepare :: String -> Phrase
-prepare = words . map toLower .
+prepare = reduce.words . map toLower .
           filter (not . flip elem ".,:;*!#%&|")--reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
 rulesCompile  = map $ map2 (words. map toLower, map words)
 --------------------------------------
 
-plsd = ["you", "will", "never", "see", "your", "reflection", "in", "my", "eyes"]
 reductions :: [PhrasePair]
 reductions = (map.map2) (words, words)
   [ ( "please *", "*" ),
@@ -92,15 +89,11 @@ reduce :: Phrase -> Phrase
 reduce = reductionsApply reductions
 
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
-{- TO BE WRITTEN -}
-reductionsApply _ = id
-
+reductionsApply reductions = fix $ try $ transformationsApply "*" id reductions
 
 -------------------------------------------------------
 -- Match and substitute
 --------------------------------------------------------
--- wildcard t s (char, string, string)
--- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
 substitute w t s =  concatMap replace  t
   where replace x | x == w = s
@@ -112,17 +105,15 @@ match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ [] [] = Just []
 match _ [] s = Nothing
 match _ p [] = Nothing
-match w p s
-  | head p == w      = orElse (singleWildcardMatch p s) (longerWildcardMatch p s)
-  | head p == head s = match w (tail p) (tail s)
-  | otherwise        = Nothing
+match w (p:ps) (s:ss)
+  | p == w    = orElse (singleWildcardMatch (p:ps) (s:ss)) (longerWildcardMatch (p:ps) (s:ss))
+  | p == s    = match w ps ss
+  | otherwise = Nothing
 
--- The function singleWildcardMatch defines the case when the rest of the list matches with the rest of the pattern, i.e. the front wildcard removed
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
 singleWildcardMatch (wc:ps) (x:xs) = mmap (const [x]) $ match wc ps xs
--- The function longerWildcardMatch defines the case when rest of the list matches with the pattern with the wildcard retained at the front.
-longerWildcardMatch (wc:ps) (x:xs) =  mmap (x:) $ match wc (wc:ps) xs
+longerWildcardMatch (wc:ps) (x:xs) = mmap (x:) $ match wc (wc:ps) xs
 
 -- Test cases --------------------
 
@@ -136,8 +127,6 @@ substituteCheck = substituteTest == testString
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
 
-
-
 -------------------------------------------------------
 -- Applying patterns
 --------------------------------------------------------
@@ -147,13 +136,7 @@ transformationApply wc f s p
   | Just m <- match wc (fst p) s = Just $ substitute wc (snd p) $ f m
   | otherwise                    = Nothing
 
--- transformationApply wc f s p
---   | match wc (fst p) s == Nothing = Nothing
---   | otherwise =  Just $ substitute wc (snd p) $ maybe s id $ mmap f $ match wc (fst p) s
 -- Applying a list of patterns until one succeeds
--- wc function patterns string
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ [] _ = Nothing
-transformationsApply wc f (p:ps) s
-  | transformationApply wc f s p == Nothing = transformationsApply wc f ps s--transformationApply wc f s p--val <- transformationApply wc f s p = val
-  | otherwise                           =  transformationApply wc f s p
+transformationsApply wc f (p:ps) s = orElse (transformationApply wc f s p) (transformationsApply wc f ps s)
