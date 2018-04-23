@@ -30,7 +30,7 @@ stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind _ = return id
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-rulesApply transformations phrase =  maybe phrase id $ transformationsApply "*" reflect transformations phrase
+rulesApply transformations phrase =  maybe [] id $ transformationsApply "*" reflect transformations phrase
 
 reflect :: Phrase -> Phrase
 reflect phrase = map refl phrase
