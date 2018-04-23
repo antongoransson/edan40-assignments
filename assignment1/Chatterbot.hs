@@ -148,7 +148,7 @@ matchCheck = matchTest == Just testSubstitutions
 -- Applying patterns
 --------------------------------------------------------
 -- frenchPresentation = ("My name is *", "Je m'appelle *")
--- Applying a single pattern
+-- Applying a single pattern wc function string pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) ->  Maybe [a]
 transformationApply wc f s p
   | match wc (fst p) s == Nothing = Nothing
@@ -156,6 +156,9 @@ transformationApply wc f s p
 
 
 -- Applying a list of patterns until one succeeds
+-- wc function patterns string
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ _ _ = Nothing
-{- TO BE WRITTEN -}
+transformationsApply _ _ [] _ = Nothing
+transformationsApply wc f (p:ps) s
+  | transformationApply wc f s p == Nothing = transformationsApply wc f ps s
+  | otherwise                               = transformationApply wc f s p
