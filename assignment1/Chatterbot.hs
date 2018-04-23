@@ -34,9 +34,9 @@ rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply _ = id
 
 reflect :: Phrase -> Phrase
-{- TO BE WRITTEN -}
-reflect = id
-
+reflect = map refl
+  where refl p | Just val <- lookup p reflections = val
+               | otherwise = p
 reflections =
   [ ("am",     "are"),
     ("was",    "were"),
@@ -116,9 +116,9 @@ match _ [] [] = Just []
 match _ [] s = Nothing
 match _ p [] = Nothing
 match w p s
-  | head p == w = orElse (singleWildcardMatch p s) (longerWildcardMatch p s)
+  | head p == w      = orElse (singleWildcardMatch p s) (longerWildcardMatch p s)
   | head p == head s = match w (tail p) (tail s)
-  | otherwise = Nothing
+  | otherwise        = Nothing
 
 -- The function singleWildcardMatch defines the case when the rest of the list matches with the rest of the pattern, i.e. the front wildcard removed
 -- Helper function to match
@@ -126,9 +126,6 @@ singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
 singleWildcardMatch (wc:ps) (x:xs) = mmap (const [x]) $ match wc ps xs
 -- The function longerWildcardMatch defines the case when rest of the list matches with the pattern with the wildcard retained at the front.
 longerWildcardMatch (wc:ps) (x:xs) =  mmap (x:) $ match wc (wc:ps) xs
-
-
-
 
 -- Test cases --------------------
 
@@ -151,14 +148,13 @@ matchCheck = matchTest == Just testSubstitutions
 -- Applying a single pattern wc function string pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) ->  Maybe [a]
 transformationApply wc f s p
-  | match wc (fst p) s == Nothing = Nothing
-  | otherwise =  Just $ substitute wc (snd p) $ maybe s id $ mmap f $ match wc (fst p) s
-
+  | Just m <- match wc (fst p) s = Just $ substitute wc (snd p) $ f m
+  | otherwise                    = Nothing
 
 -- Applying a list of patterns until one succeeds
 -- wc function patterns string
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
 transformationsApply _ _ [] _ = Nothing
 transformationsApply wc f (p:ps) s
-  | transformationApply wc f s p == Nothing = transformationsApply wc f ps s
-  | otherwise                               = transformationApply wc f s p
+  | val <- transformationApply wc f s p = val
+  | otherwise                           =  transformationsApply wc f ps s
