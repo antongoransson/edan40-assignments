@@ -22,7 +22,6 @@ type Phrase = [String]
 type PhrasePair = (Phrase, Phrase)
 type BotBrain = [(Phrase, [Phrase])]
 
--- ["Do you really think I don't * ?", "Perhaps eventually I will * .", "Do you really want me to * ?"]
 --------------------------------------------------------
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind brain = do
@@ -52,7 +51,6 @@ reflections =
     ("yours",  "mine"),
     ("you",    "me")
   ]
-
 
 ---------------------------------------------------------------------------------
 
@@ -132,9 +130,7 @@ matchCheck = matchTest == Just testSubstitutions
 --------------------------------------------------------
 -- Applying a single pattern wc function string pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) ->  Maybe [a]
-transformationApply wc f s p
-  | Just m <- match wc (fst p) s = Just $ substitute wc (snd p) $ f m
-  | otherwise                    = Nothing
+transformationApply wc f s p = mmap (substitute wc (snd p).f) $ match wc (fst p) s
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
