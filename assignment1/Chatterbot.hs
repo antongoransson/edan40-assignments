@@ -34,9 +34,9 @@ rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply _ = id
 
 reflect :: Phrase -> Phrase
-reflect = map refl
-  where refl p | Just val <- lookup p reflections = val
-               | otherwise = p
+reflect phrase = map refl phrase
+  where refl word | Just reflection <- lookup word reflections = reflection
+                  | otherwise = word
 reflections =
   [ ("am",     "are"),
     ("was",    "were"),
