@@ -14,15 +14,19 @@ optimalAlignments _ _ _ _ _= [("ABC ","ACBC ")]
 
 similarityScore :: String -> String -> Int
 similarityScore [] [] = 0
-similarityScore (s1:ss1) (s2:ss2) = score (s1, s2) + similarityScore ss1 ss2
+similarityScore (s1:xs1) (s2:xs2) = score (s1, s2) + similarityScore xs1 xs2
 
+--Appends(:) h1 to the first lits and h2 to the seconds list, for all pairs in a list.
 attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
 attachHeads h1 h2 aList = [(h1:xs,h2:ys) | (xs,ys) <- aList]
 
 --maximaBy length ["cs", "efd", "lth", "it"] should return ["efd", "lth"].
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
-maximaBy _ _= []
-
+maximaBy f xs = a f xs []
+  where a f (x:xs) maxs | null xs = maxs
+                        | null maxs || f x > (f . head) maxs = a f xs [x]
+                        | f x == (f . head) maxs = a f xs (x:maxs)
+                        | otherwise = a f xs maxs
 
 
 optAlignments :: String -> String -> [AlignmentType]
