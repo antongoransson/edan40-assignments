@@ -13,7 +13,8 @@ optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
 optimalAlignments _ _ _ _ _= [("ABC ","ACBC ")]
 
 similarityScore :: String -> String -> Int
-similarityScore _ _ = 0
+similarityScore [] [] = 0
+similarityScore (s1:ss1) (s2:ss2) = score (s1, s2) + similarityScore ss1 ss2
 
 attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
 attachHeads h1 h2 aList = [(h1:xs,h2:ys) | (xs,ys) <- aList]
