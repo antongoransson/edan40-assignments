@@ -6,9 +6,9 @@ scoreMismatch = -1
 scoreSpace = -1
 
 
-stringScore :: String -> String -> Int
-stringScore [] [] = 0
-stringScore (s1:xs1) (s2:xs2) = score (s1, s2) + stringScore xs1 xs2
+stringScore :: (String, String) -> Int
+stringScore ([], []) = 0
+stringScore ((s1:xs1), (s2:xs2)) = score (s1, s2) + stringScore (xs1, xs2)
 
 
 optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
@@ -34,12 +34,15 @@ maximaBy f xs = a f xs []
                         | otherwise = a f xs maxs
 
 
--- optAlignments :: String -> String -> [AlignmentType]
--- optAlignments (x:xs) (y:ys)
---   | null x && null y = ("hej", "ho")
---   | x /= '-' && y /= '-' = ("hej", "ho")
---   | x /= '-' && y == '-' = ("hej", "ho")
---   | x == '-' && y /= '-' = ("hej", "ho")
+optAlignments :: String -> String -> [AlignmentType]
+optAlignments [] [] = [("","")]
+optAlignments [] _ = [("","")]
+optAlignments _ [] = [("","")]
+optAlignments (x:xs) (y:ys) = maximaBy stringScore $ concat [
+            attachHeads x y   $ optAlignments xs ys,
+            attachHeads x '-' $ optAlignments xs (y:ys),
+            attachHeads '-' y $ optAlignments (x:xs) ys
+            ]
 
 
 -- sim((x:xs),(y:ys)) = max {sim(xs,ys) + score(x,y),
