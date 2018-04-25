@@ -13,8 +13,11 @@ optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
 optimalAlignments _ _ _ _ _= [("ABC ","ACBC ")]
 
 similarityScore :: String -> String -> Int
-similarityScore [] [] = 0
-similarityScore (s1:xs1) (s2:xs2) = score (s1, s2) + similarityScore xs1 xs2
+similarityScore [] _ = 0
+similarityScore _ [] = 0
+similarityScore (x:xs) (y:ys) = maximum [similarityScore xs ys + score (x, y),
+                              similarityScore (x:xs) ys + score ('-', y),
+                              similarityScore xs (y:ys) + score (x, '-')]
 
 --Appends(:) h1 to the first lits and h2 to the seconds list, for all pairs in a list.
 attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
@@ -29,8 +32,13 @@ maximaBy f xs = a f xs []
                         | otherwise = a f xs maxs
 
 
-optAlignments :: String -> String -> [AlignmentType]
-optAlignments _ _ = [("","")]
+-- optAlignments :: String -> String -> [AlignmentType]
+-- optAlignments (x:xs) (y:ys)
+--   | null x && null y = ("hej", "ho")
+--   | x /= '-' && y /= '-' = ("hej", "ho")
+--   | x /= '-' && y == '-' = ("hej", "ho")
+--   | x == '-' && y /= '-' = ("hej", "ho")
+
 
 -- sim((x:xs),(y:ys)) = max {sim(xs,ys) + score(x,y),
 --                           sim(xs,(y:ys)) + score(x,'-'),
