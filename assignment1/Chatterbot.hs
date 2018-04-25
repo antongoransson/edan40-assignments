@@ -29,7 +29,8 @@ stateOfMind brain = do
                  return $ rulesApply (map (map2 (id, pick r)) brain)
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-rulesApply transformations phrase =  maybe [] id $ transformationsApply "*" reflect transformations phrase
+rulesApply = (maybe [] id . ) . transformationsApply "*" reflect
+
 reflect :: Phrase -> Phrase
 reflect = map $ try (flip lookup reflections)
 
@@ -110,7 +111,7 @@ match w (p:ps) (s:ss)
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-singleWildcardMatch (wc:ps) (x:xs) = mmap (const [x]) $ match wc ps xs
+singleWildcardMatch (wc:ps) (x:xs) = match wc ps xs >> Just [x]
 longerWildcardMatch (wc:ps) (x:xs) = mmap (x:) $ match wc (wc:ps) xs
 
 -- Test cases --------------------
@@ -130,7 +131,7 @@ matchCheck = matchTest == Just testSubstitutions
 --------------------------------------------------------
 -- Applying a single pattern wc function string pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) ->  Maybe [a]
-transformationApply wc f s p = mmap (substitute wc (snd p).f) $ match wc (fst p) s
+transformationApply wc f s (a, b) = mmap (substitute wc b.f) $ match wc a s
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
