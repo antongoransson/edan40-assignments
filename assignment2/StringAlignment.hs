@@ -49,45 +49,31 @@ attachTails h1 h2 aList = [(xs++[h1], ys++[h2]) | (xs, ys) <- aList]
 --maximaBy length ["cs", "efd", "lth", "it"] should return ["efd", "lth"].
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
 maximaBy f xs = a f xs []
-  where a f (x:xs) maxs | null xs = maxs
-                        | null maxs || f x > (f . head) maxs = a f xs [x]
-                        | f x == (f . head) maxs = a f xs (x:maxs)
-                        | otherwise = a f xs maxs
-
-
--- optAlignments :: String -> String -> [AlignmentType]
--- optAlignments xs ys = maximaBy stringScore $ a xs ys
---   where
---     a [] [] = [("","")]
---     a [] ys = attachHeads '-' (head ys) [("","")]
---     a xs [] = attachHeads (head xs) '-' [("","")]
---     a (x:xs) (y:ys) = concat [
---       attachHeads x y $ a xs ys,
---       attachHeads x '-' $ a xs (y:ys),
---       attachHeads '-' y $ a (x:xs) ys
---       ]
+  where
+    a _ [] maxs = maxs
+    a f (x:xs) maxs   | null maxs || f x > (f . head) maxs = a f xs [x]
+                      | f x == (f . head) maxs = a f xs (x:maxs)
+                      | otherwise = a f xs maxs
 
 optAlignments :: String -> String -> [AlignmentType]
-optAlignments xs ys = maximaBy stringScore $ simScore xs ys (length xs) (length ys)
+optAlignments xs ys = optAlign xs ys (length xs) (length ys)
   where
-     simScore xs ys i j = simscoreTable !! i !! j
-     simscoreTable = [[ simEntry xs ys i j | j <- [0..]] | i <- [0..] ]
+     optAlign xs ys i j = optTable !! i !! j
+     optTable = [[ optEntry xs ys i j | j <- [0..]] | i <- [0..] ]
 
-     simEntry :: String-> String -> Int -> Int -> [AlignmentType]
-     simEntry xs ys 0 0 = [("","")]
-     simEntry xs ys i 0 = attachTails (head xs) '-' $ simScore xs ys (i - 1) 0
-     simEntry xs ys 0 j = attachTails  '-' (head ys) $ simScore xs ys 0 (j - 1)
-     simEntry xs ys i j =  concat [
-       attachTails x y $ simScore xs ys (i - 1) (j - 1),
-       attachTails '-'y $ simScore xs ys i (j - 1),
-       attachTails x '-'  $ simScore xs ys (i - 1) j
+     optEntry :: String-> String -> Int -> Int -> [AlignmentType]
+     optEntry xs ys 0 0 = [("", "")]
+     optEntry xs ys i 0 = attachTails (head xs) '-' $ optAlign xs ys (i - 1) 0
+     optEntry xs ys 0 j = attachTails  '-' (head ys) $ optAlign xs ys 0 (j - 1)
+     optEntry xs ys i j =  maximaBy stringScore $ concat [
+       attachTails x y $ optAlign xs ys (i - 1) (j - 1),
+       attachTails '-'y $ optAlign xs ys i (j - 1),
+       attachTails x '-'  $ optAlign xs ys (i - 1) j
       ]
       where
         x = xs!!(i - 1)
         y = ys!!(j - 1)
--- sim((x:xs),(y:ys)) = max {sim(xs,ys) + score(x,y),
---                           sim(xs,(y:ys)) + score(x,'-'),
---                           sim((x:xs),ys) + score('-',y)}
+
 score :: (Char, Char) -> Int
 score (x, '-')  = scoreSpace
 score ('-', y) = scoreSpace
@@ -101,3 +87,5 @@ string1 = "writers"
 string2 = "vintner"
 string3 = "bananrepubliksinvasionsarmestabsadjutant"
 string4 = "kontrabasfiolfodralmakarmästarlärling"
+string5 = "hejhejhejhej"
+string6 = "hejhejhejhej"
