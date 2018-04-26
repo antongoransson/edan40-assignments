@@ -35,14 +35,16 @@ maximaBy f xs = a f xs []
 
 
 optAlignments :: String -> String -> [AlignmentType]
-optAlignments [] [] = [("","")]
-optAlignments [] _ = [("","")]
-optAlignments _ [] = [("","")]
-optAlignments (x:xs) (y:ys) = maximaBy stringScore $ concat [
-            attachHeads x y   $ optAlignments xs ys,
-            attachHeads x '-' $ optAlignments xs (y:ys),
-            attachHeads '-' y $ optAlignments (x:xs) ys
-            ]
+optAlignments xs ys = maximaBy stringScore $ a xs ys
+  where
+    a [] [] = [("","")]
+    a [] ys = attachHeads '-' (head ys) [("","")]
+    a xs [] = attachHeads (head xs) '-' [("","")]
+    a (x:xs) (y:ys) = concat [
+      attachHeads x y $ a xs ys,
+      attachHeads x '-' $ a xs (y:ys),
+      attachHeads '-' y $ a (x:xs) ys
+      ]
 
 
 -- sim((x:xs),(y:ys)) = max {sim(xs,ys) + score(x,y),
