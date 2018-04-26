@@ -43,6 +43,9 @@ similarityScore xs ys = simScore (length xs) (length ys)
 attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
 attachHeads h1 h2 aList = [(h1:xs, h2:ys) | (xs, ys) <- aList]
 
+attachTails :: a -> a -> [([a],[a])] -> [([a],[a])]
+attachTails h1 h2 aList = [(xs++[h1], ys++[h2]) | (xs, ys) <- aList]
+
 --maximaBy length ["cs", "efd", "lth", "it"] should return ["efd", "lth"].
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
 maximaBy f xs = a f xs []
@@ -52,19 +55,36 @@ maximaBy f xs = a f xs []
                         | otherwise = a f xs maxs
 
 
+-- optAlignments :: String -> String -> [AlignmentType]
+-- optAlignments xs ys = maximaBy stringScore $ a xs ys
+--   where
+--     a [] [] = [("","")]
+--     a [] ys = attachHeads '-' (head ys) [("","")]
+--     a xs [] = attachHeads (head xs) '-' [("","")]
+--     a (x:xs) (y:ys) = concat [
+--       attachHeads x y $ a xs ys,
+--       attachHeads x '-' $ a xs (y:ys),
+--       attachHeads '-' y $ a (x:xs) ys
+--       ]
+
 optAlignments :: String -> String -> [AlignmentType]
-optAlignments xs ys = maximaBy stringScore $ a xs ys
+optAlignments xs ys = maximaBy stringScore $ simScore xs ys (length xs) (length ys)
   where
-    a [] [] = [("","")]
-    a [] ys = attachHeads '-' (head ys) [("","")]
-    a xs [] = attachHeads (head xs) '-' [("","")]
-    a (x:xs) (y:ys) = concat [
-      attachHeads x y $ a xs ys,
-      attachHeads x '-' $ a xs (y:ys),
-      attachHeads '-' y $ a (x:xs) ys
+     simScore xs ys i j = simscoreTable !! i !! j
+     simscoreTable = [[ simEntry xs ys i j | j <- [0..]] | i <- [0..] ]
+
+     simEntry :: String-> String -> Int -> Int -> [AlignmentType]
+     simEntry xs ys 0 0 = [("","")]
+     simEntry xs ys i 0 = attachTails (head xs) '-' $ simScore xs ys (i - 1) 0
+     simEntry xs ys 0 j = attachTails  '-' (head ys) $ simScore xs ys 0 (j - 1)
+     simEntry xs ys i j =  concat [
+       attachTails x y $ simScore xs ys (i - 1) (j - 1),
+       attachTails '-'y $ simScore xs ys i (j - 1),
+       attachTails x '-'  $ simScore xs ys (i - 1) j
       ]
-
-
+      where
+        x = xs!!(i - 1)
+        y = ys!!(j - 1)
 -- sim((x:xs),(y:ys)) = max {sim(xs,ys) + score(x,y),
 --                           sim(xs,(y:ys)) + score(x,'-'),
 --                           sim((x:xs),ys) + score('-',y)}
