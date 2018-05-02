@@ -56,24 +56,26 @@ maximaBy f xs = a f xs []
                       | otherwise = a f xs maxs
 
 optAlignments :: String -> String -> [AlignmentType]
-optAlignments xs ys = optAlign (length xs) (length ys)
+optAlignments xs ys = snd $ optAlign (length xs) (length ys)
   where
      optAlign i j = optTable !! i !! j
      optTable = [[ optEntry i j | j <- [0..]] | i <- [0..] ]
 
-     optEntry :: Int -> Int -> [AlignmentType]
-     optEntry 0 0 = [("", "")]
-     optEntry i 0 = [(take i xs, replicate i '-')]
-     optEntry 0 j = [(replicate j '-', take j ys)]
-     optEntry i j = maximaBy stringScore $  concat [
-       attachTails x y    $ optAlign (i - 1) (j - 1),
-       attachTails '-' y  $ optAlign i (j - 1),
-       attachTails x '-'  $ optAlign (i - 1) j
-       ]
-
+     optEntry :: Int -> Int -> (Int, [AlignmentType])
+     optEntry 0 0 = (0, [("", "")])
+     optEntry i 0 = (i * scoreSpace, [(take i xs, replicate i '-')])
+     optEntry 0 j = (j * scoreSpace, [(replicate j '-', take j ys)])
+     optEntry i j = ((fst.head) a, concatMap snd a )
       where
-        x = xs!!(i - 1)
-        y = ys!!(j - 1)
+          a  = maximaBy fst [
+             (f x y (optAlign (i - 1) (j - 1))),
+             (f '-' y (optAlign i (j - 1))),
+             (f x '-' (optAlign (i - 1) j))
+             ]
+          f x y alignments = (fst alignments + score (x,y), attachTails x y (snd alignments))
+          x = xs!!(i - 1)
+          y = ys!!(j - 1)
+
 
 score :: (Char, Char) -> Int
 score (x, '-')  = scoreSpace
