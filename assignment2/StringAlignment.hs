@@ -56,24 +56,19 @@ maximaBy f xs = a f xs []
                       | otherwise = a f xs maxs
 
 optAlignments :: String -> String -> [AlignmentType]
-optAlignments xs ys = optAlign xs ys (length xs) (length ys)
+optAlignments xs ys = optAlign (length xs) (length ys)
   where
-     optAlign xs ys i j = optTable !! i !! j
-     optTable = [[ optEntry xs ys i j | j <- [0..]] | i <- [0..] ]
+     optAlign i j = optTable !! i !! j
+     optTable = [[ optEntry i j | j <- [0..]] | i <- [0..] ]
 
-     optEntry :: String-> String -> Int -> Int -> [AlignmentType]
-     optEntry xs ys 0 0 = [("", "")]
-     optEntry xs ys i 0 = attachTails (xs!!(i - 1)) '-' $ optAlign xs ys (i - 1) 0
-     optEntry xs ys 0 j = attachTails  '-' (ys!!(j - 1)) $ optAlign xs ys 0 (j - 1)
-     optEntry xs ys i j
-      | x == '-' = maximaBy stringScore $
-       attachTails x y (optAlign xs ys (i - 1) (j - 1)) ++ (attachTails '-' y $ optAlign xs ys i (j - 1))
-      | y == '-' =  maximaBy stringScore $
-       attachTails x y (optAlign xs ys (i - 1) (j - 1)) ++ (attachTails x '-'  $ optAlign xs ys (i - 1) j)
-      | otherwise =  maximaBy stringScore $  concat [
-       attachTails x y    $ optAlign xs ys (i - 1) (j - 1),
-       attachTails '-' y  $ optAlign xs ys i (j - 1),
-       attachTails x '-'  $ optAlign xs ys (i - 1) j
+     optEntry :: Int -> Int -> [AlignmentType]
+     optEntry 0 0 = [("", "")]
+     optEntry i 0 = [(take i xs, replicate i '-')]
+     optEntry 0 j = [(replicate j '-', take j ys)]
+     optEntry i j = maximaBy stringScore $  concat [
+       attachTails x y    $ optAlign (i - 1) (j - 1),
+       attachTails '-' y  $ optAlign i (j - 1),
+       attachTails x '-'  $ optAlign (i - 1) j
        ]
 
       where
