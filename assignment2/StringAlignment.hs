@@ -36,17 +36,16 @@ similarityScore xs ys = simScore (length xs) (length ys)
        | x == y    = scoreMatch + simScore (i - 1) (j - 1)
        | otherwise = max (scoreMismatch + simScore i (j - 1)) (scoreMismatch + simScore (i - 1) j)
        where
-          x = xs!!(i - 1)
-          y = ys!!(j - 1)
+          x = xs !! (i - 1)
+          y = ys !! (j - 1)
 
 --Appends(:) h1 to the first lits and h2 to the seconds list, for all pairs in a list.
 attachHeads :: a -> a -> [([a],[a])] -> [([a],[a])]
 attachHeads h1 h2 aList = [(h1:xs, h2:ys) | (xs, ys) <- aList]
 
 attachTails :: a -> a -> [([a],[a])] -> [([a],[a])]
-attachTails h1 h2 aList = [(xs++[h1], ys++[h2]) | (xs, ys) <- aList]
+attachTails h1 h2 aList = [(xs ++ [h1], ys ++ [h2]) | (xs, ys) <- aList]
 
---maximaBy length ["cs", "efd", "lth", "it"] should return ["efd", "lth"].
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
 maximaBy f xs = a f xs []
   where
@@ -65,20 +64,20 @@ optAlignments xs ys = snd $ optAlign (length xs) (length ys)
      optEntry 0 0 = (0, [("", "")])
      optEntry i 0 = (i * scoreSpace, [(take i xs, replicate i '-')])
      optEntry 0 j = (j * scoreSpace, [(replicate j '-', take j ys)])
-     optEntry i j = ((fst.head) a, concatMap snd a )
+     optEntry i j = ((fst . head) a, concatMap snd a )
       where
           a  = maximaBy fst [
-             (f x y (optAlign (i - 1) (j - 1))),
-             (f '-' y (optAlign i (j - 1))),
-             (f x '-' (optAlign (i - 1) j))
+             f x y   (optAlign (i - 1) (j - 1)),
+             f '-' y (optAlign i (j - 1)),
+             f x '-' (optAlign (i - 1) j)
              ]
           f x y alignments = (fst alignments + score (x,y), attachTails x y (snd alignments))
-          x = xs!!(i - 1)
-          y = ys!!(j - 1)
+          x = xs !! (i - 1)
+          y = ys !! (j - 1)
 
 
 score :: (Char, Char) -> Int
-score (x, '-')  = scoreSpace
+score (x, '-') = scoreSpace
 score ('-', y) = scoreSpace
 score (x, y)
   | x == y    = scoreMatch
