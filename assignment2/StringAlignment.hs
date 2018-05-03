@@ -96,19 +96,9 @@ optAlignments xs ys = snd $ optAlign (length xs) (length ys)
           x = xs !! (i - 1)
           y = ys !! (j - 1)
 
-
 score :: (Char, Char) -> Int
 score (x, '-') = scoreSpace
 score ('-', y) = scoreSpace
 score (x, y)
   | x == y    = scoreMatch
   | otherwise = scoreMismatch
-
-
-
-string1 = "writers"
-string2 = "vintner"
-string3 = "bananrepubliksinvasionsarmestabsadjutant"
-string4 = "kontrabasfiolfodralmakarmästarlärling"
-string5 = "hejhejhejhej"
-string6 = "hejhejhejhej"
