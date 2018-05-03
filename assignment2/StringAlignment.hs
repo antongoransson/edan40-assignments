@@ -54,6 +54,18 @@ maximaBy f xs = a f xs []
                       | f x == (f . head) maxs = a f xs (x:maxs)
                       | otherwise = a f xs maxs
 
+optAlignmentsSlow :: String -> String -> [AlignmentType]
+optAlignmentsSlow xs ys = maximaBy stringScore $ a xs ys
+  where
+    a [] [] = [("","")]
+    a [] ys = attachHeads '-' (head ys) [("","")]
+    a xs [] = attachHeads (head xs) '-' [("","")]
+    a (x:xs) (y:ys) = concat [
+      attachHeads x y $ a xs ys,
+      attachHeads x '-' $ a xs (y:ys),
+      attachHeads '-' y $ a (x:xs) ys
+      ]
+
 optAlignments :: String -> String -> [AlignmentType]
 optAlignments xs ys = snd $ optAlign (length xs) (length ys)
   where
