@@ -8,7 +8,7 @@ scoreSpace = -1
 
 stringScore :: (String, String) -> Int
 stringScore ([], []) = 0
-stringScore ((s1:xs1), (s2:xs2)) = score (s1, s2) + stringScore (xs1, xs2)
+stringScore (s1:xs1, s2:xs2) = score (s1, s2) + stringScore (xs1, xs2)
 
 
 optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
