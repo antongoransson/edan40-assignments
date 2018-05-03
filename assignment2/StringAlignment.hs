@@ -10,9 +10,18 @@ stringScore :: (String, String) -> Int
 stringScore ([], []) = 0
 stringScore (s1:xs1, s2:xs2) = score (s1, s2) + stringScore (xs1, xs2)
 
+outputAlignments :: String -> String -> IO()
+outputAlignments xs ys = do
+  let x = optAlignments xs ys
+  putStrLn ""
+  putStr (unlines (map unpackPairs x))
+  putStrLn $ "Number of optimal alignments: "  ++  show (length x)
 
-optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
-optimalAlignments _ _ _ _ _= [("ABC ","ACBC ")]
+unpackPairs :: (String, String) -> String
+unpackPairs (a, b) = addSpace a ++ "\n" ++ addSpace b ++ "\n"
+
+addSpace :: String -> String
+addSpace = concatMap (:[' '])
 
 -- similarityScore :: String -> String -> Int
 -- similarityScore [] _ = scoreSpace
