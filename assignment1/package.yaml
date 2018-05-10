@@ -1,0 +1,53 @@
+name:                assignment1
+version:             0.1.0.0
+github:              "antongoransson/edan40-assignments/assignment1"
+license:             BSD3
+author:              "Anton Göransson and Tobias Olsson"
+maintainer:          "example@example.com"
+copyright:           "2018 Anton Göransson and Tobias Olsson"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/assignment1#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- random
+
+library:
+  source-dirs: src
+  
+
+executables:
+  assignment1-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - assignment1
+
+tests:
+  assignment1-test:
+    main:                ChatterbotTest.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - assignment1
+    - tasty
+    - tasty-hunit
+    - tasty-quickcheck
