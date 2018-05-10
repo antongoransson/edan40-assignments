@@ -6,10 +6,6 @@ author:              "Anton Göransson and Tobias Olsson"
 maintainer:          "example@example.com"
 copyright:           "2018 Anton Göransson and Tobias Olsson"
 
-extra-source-files:
-- README.md
-- ChangeLog.md
-
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
 # category:            Web
@@ -50,4 +46,3 @@ tests:
     - assignment1
     - tasty
     - tasty-hunit
-    - tasty-quickcheck

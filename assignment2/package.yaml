@@ -1,10 +1,10 @@
 name:                assignment2
 version:             0.1.0.0
-github:              "githubuser/assignment2"
+github:              "antongoransson/edan40-assignments/assignment2"
 license:             BSD3
 author:              "Author name here"
 maintainer:          "example@example.com"
-copyright:           "2018 Author name here"
+copyright:           "2018 Anton Göransson and Tobias Olsson"
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package

@@ -15,7 +15,7 @@ attachHeadsTest = testCase "attach heads test" $
 maximaByTest = testCase "maximaBy test" $
   maximaBy length ["cs", "efd", "lth", "it"] @?= ["lth", "efd"]
 
-optimalAlignSlowTest = testCase "optimal align prime" $
+optimalAlignSlowTest = testCase "optimal align slow" $
   optAlignmentsSlow "writers" "vintner" @?= [("wri-t-ers","-vintner-"),("wri-t-ers","v-intner-"),("writ-ers","vintner-")]
 
 

@@ -35,10 +35,10 @@ addSpace = concatMap (:[' '])
 similarityScoreSlow :: String -> String -> Int
 similarityScoreSlow [] _ = scoreSpace
 similarityScoreSlow _ [] = scoreSpace
-similarityScoreSlow (x:xs) (y:ys) = maximum [
-                                similarityScoreSlow xs ys + score (x, y),
-                                similarityScoreSlow (x:xs) ys + score ('-', y),
-                                similarityScoreSlow xs (y:ys) + score (x, '-')
+similarityScoreSlow (x:xs) (y:ys) = maximum 
+                                [ similarityScoreSlow xs ys + score (x, y)
+                                , similarityScoreSlow (x:xs) ys + score ('-', y)
+                                , similarityScoreSlow xs (y:ys) + score (x, '-')
                                 ]
 
 similarityScore :: String -> String -> Int
@@ -51,8 +51,8 @@ similarityScore xs ys = simScore (length xs) (length ys)
         simEntry 0 0 = 0
         simEntry _ 0 = scoreSpace
         simEntry 0 _ = scoreSpace
-        simEntry i j = maximum [
-             score(x, y ) + simScore (i - 1) (j - 1)
+        simEntry i j = maximum 
+            [ score(x, y ) + simScore (i - 1) (j - 1)
             , score('-', y) + simScore i (j - 1)
             , score(x,'-') + simScore (i - 1) j
             ]
@@ -83,10 +83,10 @@ optAlignmentsSlow xs ys = maximaBy stringScore $ findAlignments xs ys
         findAlignments [] [] = [("","")]
         findAlignments [] (y:ys) = attachHeads '-' y $ findAlignments [] ys
         findAlignments (x:xs) [] = attachHeads x '-' $ findAlignments xs []
-        findAlignments (x:xs) (y:ys) = concat [
-            attachHeads x y $ findAlignments xs ys,
-            attachHeads x '-' $ findAlignments xs (y:ys),
-            attachHeads '-' y $ findAlignments (x:xs) ys
+        findAlignments (x:xs) (y:ys) = concat 
+            [ attachHeads x y $ findAlignments xs ys
+            , attachHeads x '-' $ findAlignments xs (y:ys)
+            , attachHeads '-' y $ findAlignments (x:xs) ys
             ]
 
 
@@ -100,10 +100,10 @@ optAlignments xs ys = snd $ optAlign (length xs) (length ys)
         optEntry 0 0 = (0, [("", "")])
         optEntry i 0 = (i * scoreSpace, [(take i xs, replicate i '-')])
         optEntry 0 j = (j * scoreSpace, [(replicate j '-', take j ys)])
-        optEntry i j = ((fst . head) findpath, concatMap snd findpath )
+        optEntry i j = ((fst . head) findpath, concatMap snd findpath)
             where
-            findpath  = maximaBy fst [
-                  calcScore x y   (optAlign (i - 1) (j - 1))
+            findpath = maximaBy fst 
+                [ calcScore x y   (optAlign (i - 1) (j - 1))
                 , calcScore '-' y (optAlign i (j - 1))
                 , calcScore x '-' (optAlign (i - 1) j)
                 ]

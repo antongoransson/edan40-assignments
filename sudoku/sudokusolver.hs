@@ -32,8 +32,13 @@ values = M.fromList[(s, digits)  | s <- squares]
 gridValues grid = M.fromList $ zip squares [[c] | c <- grid , c `elem` digits || c `elem` "0."]
 --["A2", "B2", "D2", "E2", "F2", "G2", "H2", "I2", "C1", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "A1", "A3", "B1", "B3"]
 -- assign grid square digit =
--- eliminate values square digit
---   | digit `notElem` ( values M.! square) = values
---   | null( values M.! square) = M.fromList []
---   | length (values M.! square) == 1 = M.fromList []
---   | otherwise= M.fromList []
+eliminate values s d
+  | d `notElem` (values M.! s) = values
+  | otherwise = elim (M.insert s (filter (/=d) (values M.!s)) values ) s d
+    where
+      elim values s d | length (values M.! s) == 0 = M.fromList []
+                      | length (values M.! s) == 1 =  M.! insert s  peers
+
+  -- null( values M.! square) = M.fromList []
+  -- | length (values M.! square) == 1 = M.fromList []
+  -- | otherwise= M.fromList []
