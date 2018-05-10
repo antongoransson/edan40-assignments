@@ -5,12 +5,8 @@ import Test.Tasty.HUnit
 
 similarityScoreTests = testGroup "simscore test"
   [ testCase "haskell pascal" $ similarityScore "HASKELL" "PASCAL" @?= (-4)
-  , testCase "victor rotciv" $ similarityScore "victor" "rotciv" @?= (-6)
   , testCase "writers vintner" $ similarityScore "writers" "vintner" @?= (-5)
   ]
-
-attachHeadsTest = testCase "attach heads test" $
-  attachHeads 'a' 'b' [("hej","då"), ("k", "bry")] @?= [("ahej","bdå"), ("ak", "bbry")]
 
 maximaByTest = testCase "maximaBy test" $
   maximaBy length ["cs", "efd", "lth", "it"] @?= ["lth", "efd"]
