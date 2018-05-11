@@ -23,22 +23,23 @@ m -# n = error "-# not implemented"
 m #- n = error "#- not implemented"
 
 spaces :: Parser String
-spaces =  error "spaces not implemented"
+spaces =  iter (char ? isSpace)
 
 token :: Parser a -> Parser a
 token m = m #- spaces
 
 letter :: Parser Char
-letter =  error "letter not implemented"
+letter = char ? isAlpha
 
 word :: Parser String
 word = token (letter # iter letter >-> cons)
 
 chars :: Int -> Parser String
-chars n =  error "chars not implemented"
+chars 0 = return []
+chars n = char # chars (n - 1) >-> cons
 
 accept :: String -> Parser String
-accept w = (token (chars (length w))) ? (==w)
+accept w = token (chars (length w)) ? (==w)
 
 require :: String -> Parser String
 require w  = error "require not implemented"
