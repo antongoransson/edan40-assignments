@@ -1,10 +1,10 @@
 name:                assignment3
 version:             0.1.0.0
-github:              "antongoransson/assignment3"
+github:              "antongoransson/edan40-assignments/assignment3"
 license:             BSD3
 author:              "Author name here"
 maintainer:          "anton.goransson95@gmail.com"
-copyright:           "2018 Author name here"
+copyright:           "2018 Anton Göransson and Tobias Olsson"
 
 extra-source-files:
 - README.md
