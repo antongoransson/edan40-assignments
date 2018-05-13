@@ -3,6 +3,8 @@ import Test.Tasty.HUnit
 import Test.Tasty.ExpectedFailure
 import Prelude hiding (return, fail)
 import Parser
+import qualified Dictionary
+import Expr
 
 letterTest = testGroup "parser test"
     [ testCase "abc" $ letter "abc" @?= Just('a',"bc")
@@ -23,7 +25,7 @@ charsTest = testGroup "chars test"
 
 requireTest = testGroup "require test"
     [ testCase "require ok" $ require ":=" ":= 1" @?= Just (":=","1")
-    -- , testCase "ete" null [1] @? "Non-empty list" {- Program error: expecting else near then -}
+    -- , assertRaises "ete" $ require "else" "then"
     ]
 
 acceptTest = testCase "accept test" $ (accept "read" -# word) "read count" @?= Just ("count","")
@@ -36,8 +38,24 @@ parserTests = testGroup "all tests"
     , acceptTest
     ]
 
+-- n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}
+-- n31 = testValue "2+z"     {-  Expr.value: undefined variable z -}
+x = 1
+y = 2
+dict = Dictionary.insert ("x", 1) $ 
+       Dictionary.insert ("y", 2) $
+       Dictionary.empty 
+
+testValue string = value (fromString string) dict    
+exprTest = testGroup "exprTest" 
+    [ testCase "1 integer" $ testValue "1"  @?= 1
+    , testCase "x" $ testValue "x"  @?= x
+    , testCase "x+y" $ testValue "x+y"  @?= x + y
+    , testCase "x-y-y" $ testValue "x-y-y"  @?= x - y -y
+    ]
 allTests = testGroup "all tests"
     [ parserTests
+    , exprTest
     ]
 
 main :: IO ()
