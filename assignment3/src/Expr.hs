@@ -56,7 +56,7 @@ factor = num !
              
 term' e = mulOp # factor >-> bldOp e #> term' ! return e
 term = factor #> term'
-       
+
 expr' e = addOp # term >-> bldOp e #> expr' ! return e
 expr = term #> expr'
 
@@ -71,7 +71,16 @@ shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value (Num n) dict =  n
+value (Var n) dict  
+ | Just val <-Dictionary.lookup n dict = val
+ | otherwise = error ("Undefined variable" ++ n)
+value (Add t u) dict = value t dict + value u dict
+value (Sub t u) dict = value t dict - value u dict
+value (Mul t u) dict = value t dict * value u dict
+value (Div t u) dict 
+ | value u dict == 0 = error "Division by 0"
+ | otherwise = value t dict `div` value u dict
 
 instance Parse Expr where
     parse = expr
