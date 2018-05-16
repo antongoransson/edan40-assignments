@@ -54,17 +54,20 @@ exec (Write e: stmts) dict input =  Expr.value e dict : exec stmts dict input
 exec (Skip : stmts) dict input = exec stmts dict input
 exec (Comment s : stmts) dict input = exec stmts dict input
 
+indentSize = 2
+nIndents 0 = 0
+nIndents n = indentSize + nIndents (n - 1)
+indents n = replicate n ' '
 
-
-shw :: Statement -> String
-shw (If cond thenStmts elseStmts) = "if " ++ Expr.toString cond ++ " then\n" ++ shw thenStmts ++ "else\n" ++ shw elseStmts
-shw (Assignment v e) = v ++ ":=" ++ Expr.toString e ++ ";\n"
-shw (While cond wStmts) = "while " ++ Expr.toString cond ++ " do\n" ++ shw wStmts
-shw (Begin bStmts) = "begin\n" ++ concatMap shw bStmts ++ "end\n"
-shw (Read s) = "read " ++ s ++ ";\n"
-shw (Write e) = "write " ++ Expr.toString e ++ ";\n"
-shw Skip = "skip" ++ ";\n"
-shw (Comment s) = "--" ++ s ++"\n"
+shw ::Int -> Statement -> String
+shw n (If cond thenStmts elseStmts) = indents n ++"if " ++ Expr.toString cond ++ " then\n" ++ indents n ++ shw (n+1) thenStmts ++ indents n ++ "else\n" ++ indents n ++ shw  (n+1) elseStmts
+shw n (Assignment v e) = indents n ++ v ++ ":=" ++ Expr.toString e ++ ";\n"
+shw n (While cond wStmts) = indents n ++ "while " ++ Expr.toString cond ++ " do\n" ++ indents n++ shw (n+1) wStmts
+shw n (Begin bStmts) = indents n ++ "begin\n" ++ concatMap (shw (n+1)) bStmts ++ indents n ++ "end\n"
+shw n (Read s) = indents n ++ "read " ++ s ++ ";\n"
+shw n (Write e) = indents n ++ "write " ++ Expr.toString e ++ ";\n"
+shw n Skip = indents n ++ "skip" ++ ";\n"
+shw n (Comment s) = "--" ++ s ++"\n"
 instance Parse Statement where
   parse = statement
-  toString = shw
+  toString = shw 0
