@@ -1,7 +1,7 @@
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token, nextLine,
               spaces, word, (-#), (#-)) where
-import Prelude hiding (return, fail)
+import Prelude hiding (return)
 import Data.Char
 import CoreParser
 infixl 7 -#, #-
@@ -9,7 +9,7 @@ infixl 7 -#, #-
 type T a = Parser a
 
 err :: String -> Parser a
-err message cs = error (message ++" near " ++ cs ++ "\n")
+err message cs = error (message ++ " near " ++ cs ++ "\n")
 
 iter :: Parser a -> Parser [a]
 iter m = m # iter m >-> cons ! return []

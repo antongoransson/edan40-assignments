@@ -23,7 +23,7 @@ module Expr(Expr, T, parse, fromString, value, toString) where
    value e env evaluates e in an environment env that is represented by a
    Dictionary.T Int.
 -}
-import Prelude hiding (return, fail)
+import Prelude hiding (return)
 import Parser hiding (T)
 import qualified Dictionary
 
@@ -41,13 +41,13 @@ var = word >-> Var
 
 num = number >-> Num
 
-mulOp = lit '*' >-> (\ _ -> Mul) !
-        lit '/' >-> (\ _ -> Div) !
-        lit '^' >-> (\ _ -> Exp)
+mulOp = lit '*' >-> const Mul !
+        lit '/' >-> const Div !
+        lit '^' >-> const Exp
 
 
-addOp = lit '+' >-> (\ _ -> Add) !
-        lit '-' >-> (\ _ -> Sub)
+addOp = lit '+' >-> const Add !
+        lit '-' >-> const Sub
 
 bldOp e (oper,e') = oper e e'
 
@@ -67,11 +67,11 @@ parens cond str = if cond then "(" ++ str ++ ")" else str
 shw :: Int -> Expr -> String
 shw prec (Num n) = show n
 shw prec (Var v) = v
-shw prec (Add t u) = parens (prec>5) (shw 5 t ++ "+" ++ shw 5 u)
-shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
-shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
-shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
-shw prec (Exp t u) = parens (prec>6) (shw 6 t ++ "^" ++ shw 7 u)
+shw prec (Add t u) = parens (prec > 5) (shw 5 t ++ "+" ++ shw 5 u)
+shw prec (Sub t u) = parens (prec > 5) (shw 5 t ++ "-" ++ shw 6 u)
+shw prec (Mul t u) = parens (prec > 6) (shw 6 t ++ "*" ++ shw 6 u)
+shw prec (Div t u) = parens (prec > 6) (shw 6 t ++ "/" ++ shw 7 u)
+shw prec (Exp t u) = parens (prec > 6) (shw 6 t ++ "^" ++ shw 7 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) dict =  n

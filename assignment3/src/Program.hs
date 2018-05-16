@@ -2,7 +2,7 @@ module Program(T, parse, fromString, toString, exec) where
 import Parser hiding (T)
 import qualified Statement
 import qualified Dictionary
-import Prelude hiding (return, fail)
+import Prelude
 newtype T = Program [Statement.T]
 
 instance Parse T where

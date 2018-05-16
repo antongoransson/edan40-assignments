@@ -1,5 +1,5 @@
 module Statement(T, parse, toString, fromString, exec) where
-import Prelude hiding (return, fail)
+import Prelude
 import Parser hiding (T)
 import qualified Dictionary
 import qualified Expr

@@ -88,8 +88,8 @@ statementTest =  testGroup "statementTest"
     ]    
 
 -- PROGRAM TESTS
-p, p1, p2, p3 :: Program.T
-p = fromString  ("\
+p, p1 :: Program.T
+p = fromString  "\
 \read k;\
 \read n;\
 \m := 1;\
@@ -100,9 +100,9 @@ p = fromString  ("\
 \    else\
 \      write m;\
 \    m := m + 1;\
-\  end")
+\  end"
 
-p1 = fromString  ("\
+p1 = fromString  "\
 \read n;\
 \read b;\
 \m := 1;\
@@ -117,13 +117,9 @@ p1 = fromString  ("\
 \    p := p*10;\
 \    n :=q;\
 \  end\
-\write s;")
+\write s;"
 
-p2 = fromString (toString p)
-
-p3 = fromString (toString p1)
-
-p4 = fromString  ("\
+p4 = fromString  "\
 \read a;\
 \read b;\
 \-- a comment\n\
@@ -136,7 +132,7 @@ p4 = fromString  ("\
 \    write d;\                    
 \    a := a-1;\
 \  end\
-\write a;")
+\write a;"
 
 programTest =  testGroup "programtest"
     [ testCase "program p [3,16]" $ Program.exec p [3,16] @?= [3, 6, 9, 12, 15]
