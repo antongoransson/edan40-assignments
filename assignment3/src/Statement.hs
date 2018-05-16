@@ -9,7 +9,7 @@ data Statement =
     Assignment String Expr.T |
     If Expr.T Statement Statement |
     Begin [Statement] |
-    While Expr.T Statement | 
+    While Expr.T Statement |
     Read String |
     Write Expr.T |
     Skip |
@@ -39,33 +39,32 @@ buildIf ((a, b), c) = If a b c
 comment = accept "--" -# nextLine -# require "\n" >-> Comment
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
-exec (If cond thenStmts elseStmts: stmts) dict input = 
-    if Expr.value cond dict > 0 
+exec (If cond thenStmts elseStmts: stmts) dict input =
+    if Expr.value cond dict > 0
     then exec (thenStmts: stmts) dict input
     else exec (elseStmts: stmts) dict input
-exec (Assignment v e : stmts) dict input = exec stmts (Dictionary.insert(v, Expr.value e dict) dict) input    
-exec (While cond wStmts : stmts) dict input = 
-    if Expr.value cond dict > 0 
+exec (Assignment v e : stmts) dict input = exec stmts (Dictionary.insert(v, Expr.value e dict) dict) input
+exec (While cond wStmts : stmts) dict input =
+    if Expr.value cond dict > 0
     then exec (wStmts: While cond wStmts : stmts) dict input
     else exec stmts dict input
 exec (Begin bStmts : stmts) dict input = exec (bStmts ++ stmts) dict input
-exec (Read s : stmts) dict (i:input) = exec stmts (Dictionary.insert(s, i) dict) input 
-exec (Write e: stmts) dict input =  Expr.value e dict : exec stmts dict input 
+exec (Read s : stmts) dict (i:input) = exec stmts (Dictionary.insert(s, i) dict) input
+exec (Write e: stmts) dict input =  Expr.value e dict : exec stmts dict input
 exec (Skip : stmts) dict input = exec stmts dict input
 exec (Comment s : stmts) dict input = exec stmts dict input
 
 
 
-shw :: [Statement] -> String
-shw (If cond thenStmts elseStmts: stmts) = "if" ++ Expr.toString cond ++ "then" ++ show (thenStmts:stmts) ++ "else" ++ shw (elseStmts:stmts) ++ ";"
-shw (Assignment v e : stmts) = v ++ ":=" ++ Expr.toString e ++ ";" ++ shw stmts 
-shw (While cond wStmts : stmts) = undefined 
-shw (Begin bStmts : stmts) = undefined
-shw (Read s : stmts) = undefined  
-shw (Write e: stmts) = undefined  
-shw (Skip : stmts) = undefined 
-shw (Comment s : stmts) = undefined 
+shw :: Statement -> String
+shw (If cond thenStmts elseStmts) = "if" ++ Expr.toString cond ++ "then" ++ shw thenStmts ++ "else" ++ shw elseStmts ++ ";"
+shw (Assignment v e) = v ++ ":=" ++ Expr.toString e ++ ";"
+shw (While cond wStmts) = "while" ++ Expr.toString cond ++ "do" ++ shw wStmts
+shw (Begin bStmts) = "begin" ++ concatMap shw bStmts ++ "end"
+shw (Read s) = "read" ++ s ++ ";"
+shw (Write e) = "write" ++ Expr.toString e ++ ";"
+shw Skip = "skip" ++ ";"
+shw (Comment s) = "--" ++ s
 instance Parse Statement where
   parse = statement
-  toString = shw 0
-
+  toString = shw
