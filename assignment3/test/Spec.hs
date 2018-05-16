@@ -80,7 +80,8 @@ statementTest =  testGroup "statementTest"
     , testCase "assign var" $ Statement.toString p4 @?= "count:=0;\n"
     , testCase "begin" $ Statement.toString p5 @?= "begin\n" ++ indent ++ "skip;\nend\n"
     , testCase "begin with var" $ Statement.toString p6 @?= "begin\n" ++ indent ++ "x:=0;\n"++ indent ++ "x:=x+1;\nend\n"
-    , testCase "if staetment" $ Statement.toString p7 @?= "if x then\n" ++ indent ++ "skip;\nelse\n" ++ indent ++ "x:=0-x;\n"
+    , testCase "if statement" $ Statement.toString p7 @?= "if x then\n" ++ indent ++ "skip;\nelse\n" ++ indent ++ "x:=0-x;\n"
+    , testCase "if statement" $ Statement.toString p9 @?= "while n do\n" ++ indent ++ "begin\n" ++ indent ++ indent ++ "fac:=fac*n;\n" ++ indent ++ indent ++ "n:=n-1;\n" ++ indent ++ "end\n"
     
     ]     
 allTests = testGroup "all tests"
