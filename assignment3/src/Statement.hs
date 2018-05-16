@@ -57,13 +57,13 @@ exec (Comment s : stmts) dict input = exec stmts dict input
 indentSize = 2
 nIndents 0 = 0
 nIndents n = indentSize + nIndents (n - 1)
-indents n = replicate n ' '
+indents n = replicate (nIndents n) ' '
 
 shw ::Int -> Statement -> String
-shw n (If cond thenStmts elseStmts) = indents n ++"if " ++ Expr.toString cond ++ " then\n" ++ indents n ++ shw (n+1) thenStmts ++ indents n ++ "else\n" ++ indents n ++ shw  (n+1) elseStmts
+shw n (If cond thenStmts elseStmts) = indents n ++"if " ++ Expr.toString cond ++ " then\n" ++ indents n ++ shw (n + 1) thenStmts ++ indents n ++ "else\n" ++ indents n ++ shw (n + 1) elseStmts
 shw n (Assignment v e) = indents n ++ v ++ ":=" ++ Expr.toString e ++ ";\n"
-shw n (While cond wStmts) = indents n ++ "while " ++ Expr.toString cond ++ " do\n" ++ indents n++ shw (n+1) wStmts
-shw n (Begin bStmts) = indents n ++ "begin\n" ++ concatMap (shw (n+1)) bStmts ++ indents n ++ "end\n"
+shw n (While cond wStmts) = indents n ++ "while " ++ Expr.toString cond ++ " do\n" ++ indents n++ shw (n + 1) wStmts
+shw n (Begin bStmts) = indents n ++ "begin\n" ++ concatMap (shw (n + 1)) bStmts ++ indents n ++ "end\n"
 shw n (Read s) = indents n ++ "read " ++ s ++ ";\n"
 shw n (Write e) = indents n ++ "write " ++ Expr.toString e ++ ";\n"
 shw n Skip = indents n ++ "skip" ++ ";\n"
