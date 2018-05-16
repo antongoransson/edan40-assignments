@@ -1,6 +1,5 @@
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.ExpectedFailure
 import Prelude hiding (return, fail)
 import Parser
 import qualified Dictionary
@@ -25,17 +24,19 @@ charsTest = testGroup "chars test"
 
 requireTest = testGroup "require test"
     [ testCase "require ok" $ require ":=" ":= 1" @?= Just (":=","1")
-    -- , assertRaises "ete" $ require "else" "then"
     ]
 
 acceptTest = testCase "accept test" $ (accept "read" -# word) "read count" @?= Just ("count","")
-
+nextLineTest = testGroup "comment test"
+    [ testCase "ignore comment ok" $ (spaces #-nextLine -# require "\n")  "ADsdsadsadasdasdas\n" @?= Just ("\n","")
+    ]
 parserTests = testGroup "all tests"
     [ letterTest
     , spacesTest
     , charsTest
     , requireTest
     , acceptTest
+    , nextLineTest
     ]
 
 -- n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}

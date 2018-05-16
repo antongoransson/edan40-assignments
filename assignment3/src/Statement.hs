@@ -12,10 +12,11 @@ data Statement =
     While Expr.T Statement | 
     Read String |
     Write Expr.T |
-    Skip
+    Skip |
+    Comment String
     deriving Show
 
-statement = skip ! assignment ! begin ! ifElse ! while ! read' ! write
+statement = comment ! skip ! assignment ! begin ! ifElse ! while ! read' ! write
 
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
 buildAss (v, e) = Assignment v e
@@ -35,6 +36,8 @@ write = accept "write" -# Expr.parse #- require ";" >-> Write
 ifElse = accept "if" -# Expr.parse #- require "then" # parse #- require "else" # parse >-> buildIf
 buildIf ((a, b), c) = If a b c
 
+comment = accept "--" -# nextLine -# require "\n" >-> Comment
+
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec (If cond thenStmts elseStmts: stmts) dict input = 
     if Expr.value cond dict > 0 
@@ -49,7 +52,7 @@ exec (Begin bStmts : stmts) dict input = exec (bStmts ++ stmts) dict input
 exec (Read s : stmts) dict (i:input) = exec stmts (Dictionary.insert(s, i) dict) input 
 exec (Write e: stmts) dict input =  Expr.value e dict : exec stmts dict input 
 exec (Skip : stmts) dict input = exec stmts dict input
-
+exec (Comment s : stmts) dict input = exec stmts dict input
 instance Parse Statement where
   parse = statement
   toString = error "Statement.toString not implemented"
