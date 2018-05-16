@@ -21,10 +21,10 @@ statement = comment ! skip ! assignment ! begin ! ifElse ! while ! read' ! write
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
 buildAss (v, e) = Assignment v e
 
-skip = accept "skip" #- require "skip;" >-> buildSkip
+skip = accept "skip" #- require ";" >-> buildSkip
 buildSkip _ = Skip
 
-begin = accept "begin" -# iter (parse #- spaces) #- require "end;" >-> Begin
+begin = accept "begin" -# iter (parse #- spaces) #- require "end" >-> Begin
 
 while = accept "while" -# Expr.parse #- require "do" # parse >-> buildWhile
 buildWhile (a, b) = While a b
@@ -57,14 +57,14 @@ exec (Comment s : stmts) dict input = exec stmts dict input
 
 
 shw :: Statement -> String
-shw (If cond thenStmts elseStmts) = "if" ++ Expr.toString cond ++ "then" ++ shw thenStmts ++ "else" ++ shw elseStmts ++ ";"
-shw (Assignment v e) = v ++ ":=" ++ Expr.toString e ++ ";"
-shw (While cond wStmts) = "while" ++ Expr.toString cond ++ "do" ++ shw wStmts
-shw (Begin bStmts) = "begin" ++ concatMap shw bStmts ++ "end"
-shw (Read s) = "read" ++ s ++ ";"
-shw (Write e) = "write" ++ Expr.toString e ++ ";"
-shw Skip = "skip" ++ ";"
-shw (Comment s) = "--" ++ s
+shw (If cond thenStmts elseStmts) = "if " ++ Expr.toString cond ++ " then\n" ++ shw thenStmts ++ "else\n" ++ shw elseStmts
+shw (Assignment v e) = v ++ ":=" ++ Expr.toString e ++ ";\n"
+shw (While cond wStmts) = "while " ++ Expr.toString cond ++ " do\n" ++ shw wStmts
+shw (Begin bStmts) = "begin\n" ++ concatMap shw bStmts ++ "end\n"
+shw (Read s) = "read " ++ s ++ ";\n"
+shw (Write e) = "write " ++ Expr.toString e ++ ";\n"
+shw Skip = "skip" ++ ";\n"
+shw (Comment s) = "--" ++ s ++"\n"
 instance Parse Statement where
   parse = statement
   toString = shw
