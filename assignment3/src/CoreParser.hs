@@ -1,7 +1,7 @@
 module CoreParser(Parser, char, return, fail, (#), (!), (?), (#>), (>->),
                   Parse, parse, toString, fromString) where
 import Prelude hiding (return, fail)
-infixl 3 ! 
+infixl 3 !
 infixl 7 ?
 infixl 6 #
 infixl 5 >->
@@ -26,37 +26,37 @@ char (c:cs) = Just (c, cs)
 return :: a -> Parser a
 return a cs = Just (a, cs)
 
-fail ::  Parser a 
+fail ::  Parser a
 fail cs = Nothing
 
 (!) :: Parser a -> Parser a -> Parser a
 (m ! n) cs = case m cs of
-             Nothing -> n cs 
+             Nothing -> n cs
              mcs -> mcs
 
 (?) :: Parser a -> (a -> Bool) -> Parser a
-(m ? p) cs = 
+(m ? p) cs =
     case m cs of
     Nothing -> Nothing
     Just(r, s) -> if p r then Just(r, s) else Nothing
 
 (#) :: Parser a -> Parser b -> Parser (a, b)
-(m # n) cs = 
+(m # n) cs =
     case m cs of
     Nothing -> Nothing
-    Just(a, cs') -> 
+    Just(a, cs') ->
         case n cs' of
         Nothing -> Nothing
         Just(b, cs'') -> Just((a, b), cs'')
 
 (>->) :: Parser a -> (a -> b) -> Parser b
-(m >-> b) cs = 
+(m >-> b) cs =
     case m cs of
     Just(a, cs') -> Just(b a, cs')
     Nothing -> Nothing
 
-(#>) :: Parser a -> (a -> Parser b) -> Parser b 
-(p #> k) cs = 
+(#>) :: Parser a -> (a -> Parser b) -> Parser b
+(p #> k) cs =
     case p cs of
     Nothing -> Nothing
     Just(a, cs') -> k a cs'
