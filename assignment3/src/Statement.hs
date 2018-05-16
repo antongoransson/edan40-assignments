@@ -53,7 +53,19 @@ exec (Read s : stmts) dict (i:input) = exec stmts (Dictionary.insert(s, i) dict)
 exec (Write e: stmts) dict input =  Expr.value e dict : exec stmts dict input 
 exec (Skip : stmts) dict input = exec stmts dict input
 exec (Comment s : stmts) dict input = exec stmts dict input
+
+
+
+shw :: [Statement] -> String
+shw (If cond thenStmts elseStmts: stmts) = "if" ++ Expr.toString cond ++ "then" ++ show (thenStmts:stmts) ++ "else" ++ shw (elseStmts:stmts) ++ ";"
+shw (Assignment v e : stmts) = v ++ ":=" ++ Expr.toString e ++ ";" ++ shw stmts 
+shw (While cond wStmts : stmts) = undefined 
+shw (Begin bStmts : stmts) = undefined
+shw (Read s : stmts) = undefined  
+shw (Write e: stmts) = undefined  
+shw (Skip : stmts) = undefined 
+shw (Comment s : stmts) = undefined 
 instance Parse Statement where
   parse = statement
-  toString = error "Statement.toString not implemented"
+  toString = shw 0
 
