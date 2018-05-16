@@ -39,6 +39,7 @@ buildIf ((a, b), c) = If a b c
 comment = accept "--" -# nextLine #- require "\n" >-> Comment
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
+exec [] _ _ = []
 exec (If cond thenStmts elseStmts: stmts) dict input =
     if Expr.value cond dict > 0
     then exec (thenStmts: stmts) dict input

@@ -49,7 +49,7 @@ rp1 = Program.exec p1 [1024, 2]
 p4 = fromString  ("\
 \read a;\
 \read b;\
-\-- a comment\
+\-- a comment\n\
 \s := 3;\
 \while a do\
 \  begin\
