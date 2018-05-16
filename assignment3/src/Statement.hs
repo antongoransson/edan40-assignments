@@ -16,27 +16,27 @@ data Statement =
     Comment String
     deriving Show
 
-statement = comment ! skip ! assignment ! begin ! ifElse ! while ! read' ! write
+statement = commentStatement ! skipStatement ! assignmentStatement ! beginStatement ! ifStatement ! whileStatement ! readStatement ! writeStatement
 
-assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
+assignmentStatement = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
 buildAss (v, e) = Assignment v e
 
-skip = accept "skip" #- require ";" >-> buildSkip
+skipStatement = accept "skip" #- require ";" >-> buildSkip
 buildSkip _ = Skip
 
-begin = accept "begin" -# iter (parse #- spaces) #- require "end" >-> Begin
+beginStatement = accept "begin" -# iter (parse #- spaces) #- require "end" >-> Begin
 
-while = accept "while" -# Expr.parse #- require "do" # parse >-> buildWhile
+whileStatement = accept "while" -# Expr.parse #- require "do" # parse >-> buildWhile
 buildWhile (a, b) = While a b
 
-read' = accept "read" -# word #- require ";" >-> Read
+readStatement = accept "read" -# word #- require ";" >-> Read
 
-write = accept "write" -# Expr.parse #- require ";" >-> Write
+writeStatement = accept "write" -# Expr.parse #- require ";" >-> Write
 
-ifElse = accept "if" -# Expr.parse #- require "then" # parse #- require "else" # parse >-> buildIf
+ifStatement = accept "if" -# Expr.parse #- require "then" # parse #- require "else" # parse >-> buildIf
 buildIf ((a, b), c) = If a b c
 
-comment = accept "--" -# nextLine #- require "\n" >-> Comment
+commentStatement = accept "--" -# nextLine #- require "\n" >-> Comment
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
@@ -61,9 +61,9 @@ nIndents n = indentSize + nIndents (n - 1)
 indents n = replicate (nIndents n) ' '
 
 shw ::Int -> Statement -> String
-shw n (If cond thenStmts elseStmts) = indents n ++"if " ++ Expr.toString cond ++ " then\n" ++ indents n ++ shw (n + 1) thenStmts ++ indents n ++ "else\n" ++ indents n ++ shw (n + 1) elseStmts
+shw n (If cond thenStmts elseStmts) = indents n ++ "if " ++ Expr.toString cond ++ " then\n" ++ indents n ++ shw (n + 1) thenStmts ++ indents n ++ "else\n" ++ indents n ++ shw (n + 1) elseStmts
 shw n (Assignment v e) = indents n ++ v ++ ":=" ++ Expr.toString e ++ ";\n"
-shw n (While cond wStmts) = indents n ++ "while " ++ Expr.toString cond ++ " do\n" ++ indents n++ shw (n + 1) wStmts
+shw n (While cond wStmts) = indents n ++ "while " ++ Expr.toString cond ++ " do\n" ++ indents n ++ shw (n + 1) wStmts
 shw n (Begin bStmts) = indents n ++ "begin\n" ++ concatMap (shw (n + 1)) bStmts ++ indents n ++ "end\n"
 shw n (Read s) = indents n ++ "read " ++ s ++ ";\n"
 shw n (Write e) = indents n ++ "write " ++ Expr.toString e ++ ";\n"
