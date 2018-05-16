@@ -36,7 +36,7 @@ write = accept "write" -# Expr.parse #- require ";" >-> Write
 ifElse = accept "if" -# Expr.parse #- require "then" # parse #- require "else" # parse >-> buildIf
 buildIf ((a, b), c) = If a b c
 
-comment = accept "--" -# nextLine -# require "\n" >-> Comment
+comment = accept "--" -# nextLine #- require "\n" >-> Comment
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec (If cond thenStmts elseStmts: stmts) dict input =
@@ -67,7 +67,7 @@ shw n (Begin bStmts) = indents n ++ "begin\n" ++ concatMap (shw (n + 1)) bStmts 
 shw n (Read s) = indents n ++ "read " ++ s ++ ";\n"
 shw n (Write e) = indents n ++ "write " ++ Expr.toString e ++ ";\n"
 shw n Skip = indents n ++ "skip" ++ ";\n"
-shw n (Comment s) = "--" ++ s ++"\n"
+shw n (Comment s) = "-- " ++ s ++ "\n"
 instance Parse Statement where
   parse = statement
   toString = shw 0
