@@ -39,8 +39,6 @@ parserTests = testGroup "all tests"
     , nextLineTest
     ]
 
--- n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}
--- n31 = testValue "2+z"     {-  Expr.value: undefined variable z -}
 x = 1
 y = 2
 dict = Dictionary.insert ("x", 1) $ 
@@ -54,6 +52,7 @@ exprTest = testGroup "exprTest"
     , testCase "x+y" $ testValue "x+y"  @?= x + y
     , testCase "x-y-y" $ testValue "x-y-y"  @?= x - y -y
     ]
+
 allTests = testGroup "all tests"
     [ parserTests
     , exprTest
