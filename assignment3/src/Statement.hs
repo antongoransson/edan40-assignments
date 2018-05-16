@@ -40,18 +40,16 @@ commentStatement = accept "--" -# nextLine #- require "\n" >-> Comment
 
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
-exec (If cond thenStmts elseStmts: stmts) dict input =
-    if Expr.value cond dict > 0
-    then exec (thenStmts: stmts) dict input
-    else exec (elseStmts: stmts) dict input
+exec (If cond thenStmts elseStmts: stmts) dict input
+    | Expr.value cond dict > 0 = exec (thenStmts: stmts) dict input
+    | otherwise                = exec (elseStmts: stmts) dict input
+exec (While cond wStmts : stmts) dict input
+    | Expr.value cond dict > 0 = exec (wStmts: While cond wStmts : stmts) dict input
+    | otherwise                = exec stmts dict input
 exec (Assignment v e : stmts) dict input = exec stmts (Dictionary.insert(v, Expr.value e dict) dict) input
-exec (While cond wStmts : stmts) dict input =
-    if Expr.value cond dict > 0
-    then exec (wStmts: While cond wStmts : stmts) dict input
-    else exec stmts dict input
 exec (Begin bStmts : stmts) dict input = exec (bStmts ++ stmts) dict input
 exec (Read s : stmts) dict (i:input) = exec stmts (Dictionary.insert(s, i) dict) input
-exec (Write e: stmts) dict input =  Expr.value e dict : exec stmts dict input
+exec (Write e : stmts) dict input =  Expr.value e dict : exec stmts dict input
 exec (Skip : stmts) dict input = exec stmts dict input
 exec (Comment s : stmts) dict input = exec stmts dict input
 
