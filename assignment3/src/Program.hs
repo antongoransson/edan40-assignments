@@ -7,6 +7,6 @@ newtype T = Program [Statement.T]
 
 instance Parse T where
   parse = iter Statement.parse >-> Program
-  toString = error "Program.toString not implemented"
-             
+  toString (Program p) = concatMap Statement.toString p
+
 exec (Program p) = Statement.exec p Dictionary.empty
