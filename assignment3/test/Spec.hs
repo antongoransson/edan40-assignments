@@ -84,7 +84,7 @@ statementTest =  testGroup "statementTest"
     , testCase "if statement" $ Statement.toString s7 @?= "if x then\n" ++ indent ++ "skip;\nelse\n" ++ indent ++ "x:=0-x;\n"
     , testCase "while begin statement" $ Statement.toString s9 @?= "while n do\n" ++ indent ++ "begin\n" ++ indent ++ indent ++ "fac:=fac*n;\n" ++ indent ++ indent ++ "n:=n-1;\n" ++ indent ++ "end\n"
     , testCase "begin assignments" $ Statement.toString s10 @?= "begin\n" ++ indent ++ "read x;\n" ++ indent ++ "x:=x+1;\n" ++ indent ++ "write x;\nend\n"
-    , testCase "begin assignments" $ Statement.toString s11 @?= "begin\n" ++ indent ++ "read n;\n" ++ indent ++ "fac:=1;\n" ++ indent ++ "while n do\n" ++ indent ++ indent ++ indent ++ "begin\n" ++ indent ++ indent ++ indent ++ "fac:=fac*n;\n" ++ indent ++ indent ++ indent ++ "n:=n-1;\n" ++ indent ++ indent ++ "end\n"  ++ indent ++ "write fac;\nend\n"
+    , testCase "begin assignments" $ Statement.toString s11 @?= "begin\n" ++ indent ++ "read n;\n" ++ indent ++ "fac:=1;\n" ++ indent ++ "while n do\n" ++ indent ++ indent ++ "begin\n" ++ indent ++ indent ++ indent ++  "fac:=fac*n;\n" ++ indent ++ indent ++ indent ++ "n:=n-1;\n" ++ indent ++ indent ++ "end\n"  ++ indent ++ "write fac;\nend\n"
     ]    
 
 -- PROGRAM TESTS

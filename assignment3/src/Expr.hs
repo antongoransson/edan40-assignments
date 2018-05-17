@@ -28,7 +28,7 @@ import Parser hiding (T)
 import qualified Dictionary
 
 data Expr = Num Integer | Var String | Add Expr Expr
-       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
+       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Pow Expr Expr
          deriving Show
 
 type T = Expr
@@ -41,9 +41,10 @@ var = word >-> Var
 
 num = number >-> Num
 
+expOp = lit '^' >-> const Pow
+
 mulOp = lit '*' >-> const Mul !
-        lit '/' >-> const Div !
-        lit '^' >-> const Exp
+        lit '/' >-> const Div 
 
 
 addOp = lit '+' >-> const Add !
@@ -56,8 +57,11 @@ factor = num !
          lit '(' -# expr #- lit ')' !
          err "illegal factor"
 
-term' e = mulOp # factor >-> bldOp e #> term' ! return e
-term = factor #> term'
+pow' e = expOp # factor >-> bldOp e #> pow' ! return e
+pow = factor #> pow'
+         
+term' e = mulOp # pow >-> bldOp e #> term' ! return e
+term = pow #> term'
 
 expr' e = addOp # term >-> bldOp e #> expr' ! return e
 expr = term #> expr'
@@ -71,7 +75,7 @@ shw prec (Add t u) = parens (prec > 5) (shw 5 t ++ "+" ++ shw 5 u)
 shw prec (Sub t u) = parens (prec > 5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec > 6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec > 6) (shw 6 t ++ "/" ++ shw 7 u)
-shw prec (Exp t u) = parens (prec > 6) (shw 6 t ++ "^" ++ shw 7 u)
+shw prec (Pow t u) = parens (prec > 7) (shw 7 t ++ "^" ++ shw 8 u)
 
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) dict =  n
@@ -84,7 +88,7 @@ value (Mul t u) dict = value t dict * value u dict
 value (Div t u) dict
  | value u dict == 0 = error "Division by 0"
  | otherwise = value t dict `div` value u dict
-value (Exp t u) dict = value t dict ^ value u dict
+value (Pow t u) dict = value t dict ^ value u dict
 
 instance Parse Expr where
     parse = expr
